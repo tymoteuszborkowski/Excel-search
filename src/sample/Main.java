@@ -69,29 +69,29 @@ public class Main extends Application {
 
         //BUTTONS EVENTS
 
-        selectExceLFileButton.setOnAction(e ->{
+        selectExceLFileButton.setOnAction(e -> {
 
-                    FileChooser fileChooser = new FileChooser();
-                    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel files", "*.xlsx", "*.xls", "*.xlt", "*.xlm", "*.xlsm", "*.xltx", "*.xltm"));
-                    excelFile = fileChooser.showOpenDialog(mainWindow);
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel files", "*.xlsx", "*.xls", "*.xlt", "*.xlm", "*.xlsm", "*.xltx", "*.xltm"));
+            excelFile = fileChooser.showOpenDialog(mainWindow);
 
-                    if(excelFile == null){
-                        labelSelectedDirectory.setText("No directory selected");
-                        labelSelectedDirectory.setTextFill(Color.web("#AA0114"));
-                    }else{
-                        labelSelectedDirectory.setText("File path: "+ excelFile.getAbsolutePath());
-                        labelSelectedDirectory.setTextFill(Color.web("#3FAB4F"));
-                }
+            if (excelFile == null) {
+                labelSelectedDirectory.setText("No directory selected");
+                labelSelectedDirectory.setTextFill(Color.web("#AA0114"));
+            } else {
+                labelSelectedDirectory.setText("File path: " + excelFile.getAbsolutePath());
+                labelSelectedDirectory.setTextFill(Color.web("#3FAB4F"));
+            }
         });
 
         selectFolderButton.setOnAction(e -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             folderLocalization = directoryChooser.showDialog(mainWindow);
 
-            if(folderLocalization == null){
+            if (folderLocalization == null) {
                 selectedFolderLabel.setText("No folder selected!");
                 selectedFolderLabel.setTextFill(Color.web("#AA0114"));
-            }else{
+            } else {
                 selectedFolderLabel.setText("Chosen folder: " + folderLocalization.getAbsolutePath());
                 selectedFolderLabel.setTextFill(Color.web("#3FAB4F"));
             }
@@ -104,11 +104,8 @@ public class Main extends Application {
             try {
                 sheetList = service.createSheetListByPath(excelFilePath);
                 List<Cell> cells = service.getCellsFromColumnB(sheetList);
-               List<File> filesFromCells = service.createFilesFromCells(cells);
-
-              for (int i = 0; i < filesFromCells.size(); i++) {
-                    System.out.println(filesFromCells.get(i));
-                }
+                List<String> filesNames = service.createStringsFromCells(cells);
+                service.searchFiles(folderLocalization, filesNames);
             } catch (IOException | InvalidFormatException e1) {
                 e1.printStackTrace();
             }
