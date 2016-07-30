@@ -4,6 +4,7 @@ package sample;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.formula.functions.Index;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -105,11 +106,21 @@ public class PoiService {
         return listOfLists;
     }
 
+    ArrayList<String> duplicatedFileNames(List<String> fileNames){
 
-    void createNewWorkBook(ArrayList<String> foundFiles, ArrayList<String> notFoundFiles, String workbookName) throws IOException {
+        final ArrayList<String> listToReturn = new ArrayList<>();
+        final Set<String> set1 = new HashSet<>();
 
-        // todo if file is duplicating
-        // File file = new File("created workbooks/" + workbookName + ".xlsx");
+        for (String fileName : fileNames) {
+            if (!set1.add(fileName)) {
+                listToReturn.add(fileName);
+            }
+        }
+        return listToReturn;
+    }
+
+
+    void createNewWorkBook(ArrayList<String> foundFiles, ArrayList<String> notFoundFiles, ArrayList<String> duplicatedFileNames, String workbookName) throws IOException {
 
         Workbook workbook = new XSSFWorkbook();
         //style GREEN
@@ -122,6 +133,11 @@ public class PoiService {
         redStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
         redStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
 
+        //style orange
+        CellStyle orangeStyle = workbook.createCellStyle();
+        orangeStyle.setFillForegroundColor(IndexedColors.ORANGE.getIndex());
+        orangeStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
 
         FileOutputStream fileOutputStream = new FileOutputStream("created workbooks/" + workbookName + ".xlsx");
 
@@ -131,26 +147,30 @@ public class PoiService {
         Sheet notFoundSheet = workbook.createSheet("not found files");
 
 
+        // FOUND SHEET
+
         for (int i = 0; i < foundFiles.size(); i++) {
             Row row = foundSheet.createRow((short) i);
 
             Cell cellFile = row.createCell(0);
             cellFile.setCellValue(creationHelper.createRichTextString("File:"));
 
-            Cell cellFileName = row.createCell(1);
+            Cell cellFileName = row.createCell(2);
             cellFileName.setCellValue(creationHelper.createRichTextString(FilenameUtils.getName(foundFiles.get(i))));
 
-            Cell cellDir = row.createCell(3);
+            Cell cellDir = row.createCell(4);
             cellDir.setCellValue(creationHelper.createRichTextString("directory:"));
 
-            Cell cellFilePath = row.createCell(5);
+            Cell cellFilePath = row.createCell(6);
             cellFilePath.setCellValue(creationHelper.createRichTextString(foundFiles.get(i)));
 
-            Cell cellFound = row.createCell(14);
+            Cell cellFound = row.createCell(8);
             cellFound.setCellValue(creationHelper.createRichTextString("FOUND"));
             cellFound.setCellStyle(style);
 
         }
+
+        // NOT FOUND SHEET
 
         for (int i = 0; i < notFoundFiles.size(); i++) {
             Row row = notFoundSheet.createRow((short) i);
@@ -158,13 +178,58 @@ public class PoiService {
             Cell cellFile = row.createCell(0);
             cellFile.setCellValue(creationHelper.createRichTextString("File:"));
 
-            Cell cellFileName = row.createCell(1);
+            Cell cellFileName = row.createCell(2);
             cellFileName.setCellValue(creationHelper.createRichTextString(notFoundFiles.get(i)));
 
-            Cell cellNotFound = row.createCell(14);
+            Cell cellNotFound = row.createCell(4);
             cellNotFound.setCellValue(creationHelper.createRichTextString("NOT FOUND"));
             cellNotFound.setCellStyle(redStyle);
         }
+
+
+        // IF THERE ARE DUPLICATED ELEMENTS THIS SHEET IS CREATED AND FILLED
+
+        if(!duplicatedFileNames.isEmpty()){
+            Sheet duplicatedSheet = workbook.createSheet("duplicated file names");
+
+            for(int i = 0; i < duplicatedFileNames.size(); i++){
+                Row row = duplicatedSheet.createRow((short) i);
+
+                Cell cellFile = row.createCell(0);
+                cellFile.setCellValue(creationHelper.createRichTextString("File:"));
+
+                Cell cellFileName = row.createCell(2);
+                cellFileName.setCellValue(creationHelper.createRichTextString(duplicatedFileNames.get(i)));
+
+                Cell cellNotFound = row.createCell(4);
+                cellNotFound.setCellValue(creationHelper.createRichTextString("DUPLICATED"));
+                cellNotFound.setCellStyle(orangeStyle);
+
+            }
+        }
+
+
+        // auto size cells from sheet1
+        Row row1 = workbook.getSheetAt(0).getRow(0);
+
+        for(int colNum = 0; colNum<row1.getLastCellNum();colNum++)
+            workbook.getSheetAt(0).autoSizeColumn(colNum);
+
+        // auto size cells from sheet2
+        Row row2 = workbook.getSheetAt(1).getRow(0);
+
+        for(int colNum = 0; colNum<row2.getLastCellNum();colNum++)
+            workbook.getSheetAt(1).autoSizeColumn(colNum);
+
+        // auto size cells from sheet3 if exists
+
+        if(workbook.getNumberOfSheets() == 3){
+            Row row3 = workbook.getSheetAt(2).getRow(0);
+
+            for(int colNum = 0; colNum<row3.getLastCellNum();colNum++)
+                workbook.getSheetAt(2).autoSizeColumn(colNum);
+        }
+
 
 
         workbook.write(fileOutputStream);

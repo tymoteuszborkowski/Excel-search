@@ -17,7 +17,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Main extends Application {
@@ -27,6 +29,7 @@ public class Main extends Application {
 
     private File excelFile;
     private File folderLocalization;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -101,16 +104,24 @@ public class Main extends Application {
 
         checkButton.setOnAction(e -> {
             String excelFilePath = excelFile.getAbsolutePath();
+            String date = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss").format(new Date());
             try {
+                //creating list of sheets from selected excel file
                 List<Sheet> sheetList = service.createSheetListByPath(excelFilePath);
+                // creating list of cells from B column from all of sheets
                 List<Cell> cells = service.getCellsFromColumnB(sheetList);
+                // changing cells to names of searching files
                 List<String> filesNames = service.createStringsFromCells(cells);
+                // searching files by names and returning two lists: found files[0], not found files[1]
                 List<ArrayList<String>> listOfLists = service.searchFiles(folderLocalization, filesNames);
-
                 ArrayList<String> foundFiles = listOfLists.get(0);
                 ArrayList<String> notFoundFiles = listOfLists.get(1);
+                // creating list of duplicated file names
+                ArrayList<String> duplicatedFileNames = service.duplicatedFileNames(filesNames);
 
-                service.createNewWorkBook(foundFiles, notFoundFiles, "test");
+                // creating new workbook and saves info about founded, not founded, duplicated files
+                service.createNewWorkBook(foundFiles, notFoundFiles, duplicatedFileNames, date);
+
             } catch (IOException | InvalidFormatException e1) {
                 e1.printStackTrace();
             }
