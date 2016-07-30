@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
@@ -100,12 +101,16 @@ public class Main extends Application {
 
         checkButton.setOnAction(e -> {
             String excelFilePath = excelFile.getAbsolutePath();
-            List<Sheet> sheetList = null;
             try {
-                sheetList = service.createSheetListByPath(excelFilePath);
+                List<Sheet> sheetList = service.createSheetListByPath(excelFilePath);
                 List<Cell> cells = service.getCellsFromColumnB(sheetList);
                 List<String> filesNames = service.createStringsFromCells(cells);
-                service.searchFiles(folderLocalization, filesNames);
+                List<ArrayList<String>> listOfLists = service.searchFiles(folderLocalization, filesNames);
+
+                ArrayList<String> foundFiles = listOfLists.get(0);
+                ArrayList<String> notFoundFiles = listOfLists.get(1);
+
+                service.createNewWorkBook(foundFiles, notFoundFiles, "test");
             } catch (IOException | InvalidFormatException e1) {
                 e1.printStackTrace();
             }
