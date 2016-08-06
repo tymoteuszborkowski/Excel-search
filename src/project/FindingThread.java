@@ -86,7 +86,8 @@ public class FindingThread implements Runnable {
             // if number of sheets is divisible by 2 create '(number of sheet)/2' threads which searching files
 
             long start = System.currentTimeMillis();
-            if((stringFromCellsWithoutDupl.size() % 2) == 0){
+
+            if(((stringFromCellsWithoutDupl.size() % 2) == 0) && (stringFromCellsWithoutDupl.size() <= 8)){
                 for (int i = 0; i < stringFromCellsWithoutDupl.size(); i += 2) {
                     List<String> cleanerFilenames = stringFromCellsWithoutDupl.get(i);
                     List<String> cleanerFilenames2 = stringFromCellsWithoutDupl.get(i+1);
