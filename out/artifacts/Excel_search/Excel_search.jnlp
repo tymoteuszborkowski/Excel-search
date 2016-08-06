@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="Excel_search.jnlp">
+  <information>
+    <title>Excel search</title>
+    <vendor>Unknown</vendor>
+    <description>Excel search</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="Excel_search.jar" size="17175" download="eager" />
+    <jar href="commons-io-2.5.jar" size="208696" download="eager" />
+    <jar href="curvesapi-1.03.jar" size="92241" download="eager" />
+    <jar href="poi-3.14-20160307.jar" size="2528204" download="eager" />
+    <jar href="poi-examples-3.14-20160307.jar" size="340081" download="eager" />
+    <jar href="poi-excelant-3.14-20160307.jar" size="30562" download="eager" />
+    <jar href="poi-ooxml-3.14-20160307.jar" size="1286511" download="eager" />
+    <jar href="poi-ooxml-schemas-3.14-20160307.jar" size="5919795" download="eager" />
+    <jar href="poi-scratchpad-3.14-20160307.jar" size="1316029" download="eager" />
+    <jar href="xmlbeans-2.6.0.jar" size="2730866" download="eager" />
+  </resources>
+  <jfx:javafx-desc  width="600" height="400" main-class="project.Main"  name="Excel search" />
+  <update check="background"/>
+</jnlp>

@@ -1,0 +1,22 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="Excel search">
+    <output-path>$PROJECT_DIR$/out/artifacts/Excel_search</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="project.Main" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="title" value="Excel search" />
+        <option name="vendor" value="" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="Excel_search.jar">
+        <element id="module-output" name="Excel search" />
+      </element>
+      <element id="library" level="project" name="poi-examples-3.14-20160307" />
+      <element id="library" level="project" name="commons-io-2.5" />
+    </root>
+  </artifact>
+</component>
