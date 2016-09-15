@@ -1,4 +1,4 @@
-package project;
+package pl.tymoteuszborkowski.services;
 
 
 import org.apache.commons.io.FilenameUtils;
@@ -11,11 +11,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PoiService {
 
 
-    //1
+    private static final String COLUMN_TO_GRAB = "B";
+    private static final String OUTPUT_DIRECTORY = "created workbooks";
+    private static final String OUTPUT_EXTENSION = ".xlsx";
+    private static final String FOUND_FILES_SHEET = "found files";
+    private static final String NOT_FOUND_FILES_SHEET = "not found files";
+    private static final String DUPLICATED_FILENAMES_SHEET = "duplicated filenames";
+    private static final String FILE_LABEL = "File:";
+    private static final String DIRECTORY_LABEL = "directory:";
 
     public List<Sheet> createSheetListByPath(String filePath) throws IOException, InvalidFormatException {
         final List<Sheet> sheetList = new ArrayList<>();
@@ -31,9 +39,6 @@ public class PoiService {
     }
 
 
-    //2
-
-
     public List<List<String>> getCellsFromColumnB(List<Sheet> sheetList) {
 
         List<List<String>> filenames = new ArrayList<>();
@@ -44,7 +49,7 @@ public class PoiService {
             filenames.add(new ArrayList<>());
             for (int j = 0; j < sheet.getLastRowNum(); j++) {
                 Row row = sheet.getRow(j);
-                Cell cell = row.getCell(CellReference.convertColStringToIndex("B"));
+                Cell cell = row.getCell(CellReference.convertColStringToIndex(COLUMN_TO_GRAB));
                 if (cell != null) {
                     String stringCellValue = cell.getStringCellValue();
                     filenames.get(i).add(stringCellValue);
@@ -61,16 +66,12 @@ public class PoiService {
         Set<String> setFilesNames = new HashSet<>();
         List<List<String>> listsOfCleanerStrings = new ArrayList<>();
 
-        for (int i = 0; i < listsOfStringCells.size(); i++) {
-            List<String> stringCells = listsOfStringCells.get(i);
-            for (int j = 0; j < stringCells.size(); j++) {
-                setFilesNames.add(stringCells.get(j));
-            }
+        for (List<String> stringCells : listsOfStringCells) {
+            setFilesNames.addAll(stringCells);
 
             List<String> cleanerFilesNames = new ArrayList<>(setFilesNames);
             listsOfCleanerStrings.add(cleanerFilesNames);
             setFilesNames.clear();
-
         }
 
 
@@ -84,11 +85,7 @@ public class PoiService {
         final Set<String> set1 = new HashSet<>();
 
         for (List<String> list : listOfFilenames) {
-            for (String fileName : list) {
-                if (!set1.add(fileName)) {
-                    listToReturn.add(fileName);
-                }
-            }
+            listToReturn.addAll(list.stream().filter(fileName -> !set1.add(fileName)).collect(Collectors.toList()));
         }
         return listToReturn;
     }
@@ -113,13 +110,18 @@ public class PoiService {
         orangeStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
 
 
-        FileOutputStream fileOutputStream = new FileOutputStream("created workbooks/" + workbookName + ".xlsx");
+        File file = new File(OUTPUT_DIRECTORY);
+
+        if(!file.exists())
+            file.mkdir();
+
+        FileOutputStream fileOutputStream = new FileOutputStream(OUTPUT_EXTENSION + "/" + workbookName + OUTPUT_EXTENSION);
 
 
         CreationHelper creationHelper = workbook.getCreationHelper();
-        Sheet foundSheet = workbook.createSheet("found files");
-        Sheet notFoundSheet = workbook.createSheet("not found files");
-        Sheet duplicatedSheet = workbook.createSheet("duplicated file names");
+        Sheet foundSheet = workbook.createSheet(FOUND_FILES_SHEET);
+        Sheet notFoundSheet = workbook.createSheet(NOT_FOUND_FILES_SHEET);
+        Sheet duplicatedSheet = workbook.createSheet(DUPLICATED_FILENAMES_SHEET);
 
 
         // FOUND SHEET
@@ -128,13 +130,13 @@ public class PoiService {
             Row row = foundSheet.createRow((short) i);
 
             Cell cellFile = row.createCell(0);
-            cellFile.setCellValue(creationHelper.createRichTextString("File:"));
+            cellFile.setCellValue(creationHelper.createRichTextString(FILE_LABEL));
 
             Cell cellFileName = row.createCell(2);
             cellFileName.setCellValue(creationHelper.createRichTextString(FilenameUtils.getName(foundFiles.get(i))));
 
             Cell cellDir = row.createCell(4);
-            cellDir.setCellValue(creationHelper.createRichTextString("directory:"));
+            cellDir.setCellValue(creationHelper.createRichTextString(DIRECTORY_LABEL));
 
             Cell cellFilePath = row.createCell(6);
             cellFilePath.setCellValue(creationHelper.createRichTextString(foundFiles.get(i)));
@@ -152,7 +154,7 @@ public class PoiService {
                 Row row = notFoundSheet.createRow((short) i);
 
                 Cell cellFile = row.createCell(0);
-                cellFile.setCellValue(creationHelper.createRichTextString("File:"));
+                cellFile.setCellValue(creationHelper.createRichTextString(FILE_LABEL));
 
                 Cell cellFileName = row.createCell(2);
                 cellFileName.setCellValue(creationHelper.createRichTextString(notFoundFiles.get(i)));
@@ -172,7 +174,7 @@ public class PoiService {
                 Row row = duplicatedSheet.createRow((short) i);
 
                 Cell cellFile = row.createCell(0);
-                cellFile.setCellValue(creationHelper.createRichTextString("File:"));
+                cellFile.setCellValue(creationHelper.createRichTextString(FILE_LABEL));
 
                 Cell cellFileName = row.createCell(2);
                 cellFileName.setCellValue(creationHelper.createRichTextString(duplicatedFileNames.get(i)));

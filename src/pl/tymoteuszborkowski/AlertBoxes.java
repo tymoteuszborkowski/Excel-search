@@ -1,4 +1,4 @@
-package project;
+package pl.tymoteuszborkowski;
 
 
 import javafx.geometry.Pos;
@@ -10,20 +10,26 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
-public class AlertBoxes {
+class AlertBoxes {
 
-    static boolean statement;
+    private static final String CONFIRMATION_LABEL = "Confirmation";
+    private static final String CONFIRMATION_TEXT = "Are you sure you have done everything?";
+    private static final String CONFIRMATION_YES = "Yes";
+    private static final String CONFIRMATION_NO = "No";
+    private static final String OK = "Ok";
 
-    static void notSelectedAlert() {
+    private static boolean statement;
+
+    static void popUpAlert(String title, String text){
         Stage window = new Stage();
 
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Warning!");
+        window.setTitle(title);
         window.setMinWidth(250);
 
         Label label = new Label();
-        label.setText("Select Excel file and folder destination!");
-        Button closeButton = new Button("Ok");
+        label.setText(text);
+        Button closeButton = new Button(OK);
 
         closeButton.setOnAction(e -> window.close());
 
@@ -40,13 +46,13 @@ public class AlertBoxes {
         Stage window = new Stage();
 
         window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Confirmation");
+        window.setTitle(CONFIRMATION_LABEL);
         window.setMinWidth(250);
 
         Label label = new Label();
-        label.setText("Are you sure you have done everything?");
-        Button yesButton = new Button("Yes");
-        Button noButton = new Button("No");
+        label.setText(CONFIRMATION_TEXT);
+        Button yesButton = new Button(CONFIRMATION_YES);
+        Button noButton = new Button(CONFIRMATION_NO);
 
 
         yesButton.setOnAction(e -> {
@@ -68,30 +74,6 @@ public class AlertBoxes {
         window.showAndWait();
 
         return statement;
-    }
-
-
-
-    static void errorBox() {
-        Stage window = new Stage();
-
-        window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle("Error!");
-        window.setMinWidth(250);
-
-        Label label = new Label();
-        label.setText("Error! Pisz do Tymka!");
-        Button closeButton = new Button("Ok");
-
-        closeButton.setOnAction(e -> window.close());
-
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(label, closeButton);
-        layout.setAlignment(Pos.CENTER);
-
-        Scene scene = new Scene(layout);
-        window.setScene(scene);
-        window.showAndWait();
     }
 
 }

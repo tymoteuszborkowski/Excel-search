@@ -1,4 +1,4 @@
-package project;
+package pl.tymoteuszborkowski.threads;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -6,6 +6,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
+import pl.tymoteuszborkowski.services.PoiService;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +18,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FindingThread implements Runnable {
 
+
+    private static final String STEP_1 = "creating list of sheets";
+    private static final String STEP_2 = "creating list of cells";
+    private static final String STEP_3 = "searching files. this step may take even several hours";
+    private static final String STEP_4 = "creating list of duplicated file names";
+    private static final String STEP_5 = "generating workbook with founded files";
+    private static final String LAST_STEP = "complete";
+
     private PoiService service = new PoiService();
     private String excelFilePath;
     private File folderLocalization;
@@ -25,7 +34,7 @@ public class FindingThread implements Runnable {
     private GridPane layout;
     private Label endWorkLabel;
 
-    FindingThread(String excelFilePath, File folderLocalization, String date, ProgressBar progressBar, GridPane layout, Label endWorkLabel) throws IOException, InvalidFormatException {
+    public FindingThread(String excelFilePath, File folderLocalization, String date, ProgressBar progressBar, GridPane layout, Label endWorkLabel) throws IOException, InvalidFormatException {
         this.excelFilePath = excelFilePath;
         this.folderLocalization = folderLocalization;
         this.date = date;
@@ -48,7 +57,7 @@ public class FindingThread implements Runnable {
             Platform.runLater(() -> {
                 progressBar.setProgress(0.1);
                 layout.getChildren().add(endWorkLabel);
-                endWorkLabel.setText("creating list of sheets");
+                endWorkLabel.setText(STEP_1);
 
             });
             sheetList = service.createSheetListByPath(excelFilePath);
@@ -57,7 +66,7 @@ public class FindingThread implements Runnable {
             // creating list of cells from B column from all of sheets
             Platform.runLater(() -> {
                 progressBar.setProgress(0.2);
-                endWorkLabel.setText("creating list of cells");
+                endWorkLabel.setText(STEP_2);
             });
             List<List<String>> stringCells = service.getCellsFromColumnB(sheetList);
 
@@ -67,13 +76,10 @@ public class FindingThread implements Runnable {
 
 
 
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
             // searching files by names and returning two lists: found files[0], not found files[1]
             Platform.runLater(() -> {
                 progressBar.setProgress(0.4);
-                endWorkLabel.setText("searching files. this step may take even several hours");
+                endWorkLabel.setText(STEP_3);
 
             });
 
@@ -85,26 +91,19 @@ public class FindingThread implements Runnable {
 
             // if number of sheets is divisible by 2 create '(number of sheet)/2' threads which searching files
 
-            long start = System.currentTimeMillis();
-
             if(((stringFromCellsWithoutDupl.size() % 2) == 0) && (stringFromCellsWithoutDupl.size() <= 8)){
                 for (int i = 0; i < stringFromCellsWithoutDupl.size(); i += 2) {
                     List<String> cleanerFilenames = stringFromCellsWithoutDupl.get(i);
                     List<String> cleanerFilenames2 = stringFromCellsWithoutDupl.get(i+1);
                     List<String> names = new ArrayList<>(cleanerFilenames);
 
-                    for(String s: cleanerFilenames2)
-                        names.add(s);
+                    names.addAll(cleanerFilenames2);
                     threadList.add(new Thread(new SearchingThread(names, folderLocalization, foundedAndNotFounded)));
                 }
             }else{
                 ArrayList<String> everyFilenames = new ArrayList<>();
                 for(int i = 0; i < stringFromCellsWithoutDupl.size(); i++){
-                    for(List<String> list: stringFromCellsWithoutDupl){
-                        for(String name : list){
-                            everyFilenames.add(name);
-                        }
-                    }
+                    stringFromCellsWithoutDupl.forEach(everyFilenames::addAll);
                 }
 
                 Set<String> tmpList = new HashSet<>(everyFilenames);
@@ -113,15 +112,13 @@ public class FindingThread implements Runnable {
             }
 
             //start every of these threads
-            for (Thread thread : threadList)
-                thread.start();
+            threadList.forEach(Thread::start);
 
 
             // wait for end of every thread
                 for(Thread thread : threadList){
                     thread.join();
                 }
-                long seconds = System.currentTimeMillis()-start;
 
             // grab lists of founded and not founded files
             CopyOnWriteArrayList<String> tmpListFoundFiles = foundedAndNotFounded.get(0);
@@ -137,21 +134,21 @@ public class FindingThread implements Runnable {
             // creating list of duplicated file names
             Platform.runLater(() -> {
                 progressBar.setProgress(0.8);
-                endWorkLabel.setText("creating list of duplicated file names");
+                endWorkLabel.setText(STEP_4);
             });
             ArrayList<String> duplicatedFileNames = service.duplicatedFileNames(stringCells);
 
             // creating new workbook and saves info about founded, not founded, duplicated files
             Platform.runLater(() -> {
                 progressBar.setProgress(0.9);
-                endWorkLabel.setText("generating workbook with founded files");
+                endWorkLabel.setText(STEP_5);
 
             });
             service.createNewWorkBook(foundFiles, notFoundFiles, duplicatedFileNames, date);
 
             Platform.runLater(() -> {
                 progressBar.setProgress(1.0);
-                endWorkLabel.setText("complete");
+                endWorkLabel.setText(LAST_STEP);
 
             });
 
