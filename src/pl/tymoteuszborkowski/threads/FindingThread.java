@@ -19,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class FindingThread implements Runnable {
 
 
+    private static final int CORES_NUMBERS = Runtime.getRuntime().availableProcessors();
     private static final String STEP_1 = "creating list of sheets";
     private static final String STEP_2 = "creating list of cells";
     private static final String STEP_3 = "searching files. this step may take even several hours";
@@ -43,6 +44,8 @@ public class FindingThread implements Runnable {
         this.layout = layout;
         this.endWorkLabel = endWorkLabel;
         this.column = column;
+
+        System.out.println("CORES:  " + CORES_NUMBERS);
 
     }
 

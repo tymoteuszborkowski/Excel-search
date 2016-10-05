@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 public class PoiService {
 
-    private static final String OUTPUT_DIRECTORY = "created workbooks";
     private static final String OUTPUT_EXTENSION = ".xlsx";
     private static final String FOUND_FILES_SHEET = "found files";
     private static final String NOT_FOUND_FILES_SHEET = "not found files";
@@ -107,12 +106,7 @@ public class PoiService {
         orangeStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
 
 
-        File file = new File(OUTPUT_DIRECTORY);
-
-        if(!file.exists())
-            file.mkdir();
-
-        FileOutputStream fileOutputStream = new FileOutputStream(OUTPUT_EXTENSION + "/" + workbookName + OUTPUT_EXTENSION);
+        FileOutputStream fileOutputStream = new FileOutputStream(workbookName + OUTPUT_EXTENSION);
 
 
         CreationHelper creationHelper = workbook.getCreationHelper();

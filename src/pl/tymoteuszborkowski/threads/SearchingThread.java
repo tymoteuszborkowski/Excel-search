@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 class SearchingThread implements Runnable {
-
-    private static final String[] EXTENSIONS = new String[]{"gz", "gt", "sibbox", "xml", "lbl"};
-
+    
     private List<String> filenames;
     private File folderLocalization;
     private CopyOnWriteArrayList<CopyOnWriteArrayList<String>> foundedAndNotFounded;
