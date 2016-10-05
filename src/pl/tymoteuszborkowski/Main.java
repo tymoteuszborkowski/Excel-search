@@ -169,13 +169,14 @@ public class Main extends Application {
             if ((excelFile == null) || (folderLocalization == null)) {
                 AlertBoxes.popUpAlert(WARNING, SELECT_EXCEL_FILE);
             } else {
-                String excelFilePath = excelFile.getAbsolutePath();
-                String date = new SimpleDateFormat(DATE_FORMAT).format(new Date());
+                final String excelFilePath = excelFile.getAbsolutePath();
+                final String column = columnPicker.getValue();
+                final String date = new SimpleDateFormat(DATE_FORMAT).format(new Date());
 
                 try {
 
                     layout.getChildren().add(progressBar);
-                    thread = new Thread(new FindingThread(excelFilePath, folderLocalization, date, progressBar,layout, endWorkLabel ));
+                    thread = new Thread(new FindingThread(excelFilePath, column, folderLocalization, date, progressBar,layout, endWorkLabel ));
                     thread.start();
 
                 } catch (Exception e1) {

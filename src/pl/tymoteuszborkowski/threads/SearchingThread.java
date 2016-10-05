@@ -45,10 +45,8 @@ class SearchingThread implements Runnable {
 
                 for (String name : filenamesArray) {
                     if (FilenameUtils.getBaseName(file.getName()).contains(FilenameUtils.getBaseName(name))) {
-                        if ((FilenameUtils.isExtension(file.getName(), EXTENSIONS))) {
                             foundedAndNotFounded.get(0).add(file.getAbsolutePath());
                             tempList.add(FilenameUtils.getBaseName(file.getName()));
-                        }
                     }
                 }
             }

@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 
 public class PoiService {
 
-
-    private static final String COLUMN_TO_GRAB = "B";
     private static final String OUTPUT_DIRECTORY = "created workbooks";
     private static final String OUTPUT_EXTENSION = ".xlsx";
     private static final String FOUND_FILES_SHEET = "found files";
@@ -39,7 +37,7 @@ public class PoiService {
     }
 
 
-    public List<List<String>> getCellsFromColumnB(List<Sheet> sheetList) {
+    public List<List<String>> getCellsFromColumn(List<Sheet> sheetList, String column) {
 
         List<List<String>> filenames = new ArrayList<>();
 
@@ -49,12 +47,11 @@ public class PoiService {
             filenames.add(new ArrayList<>());
             for (int j = 0; j < sheet.getLastRowNum(); j++) {
                 Row row = sheet.getRow(j);
-                Cell cell = row.getCell(CellReference.convertColStringToIndex(COLUMN_TO_GRAB));
+                Cell cell = row.getCell(CellReference.convertColStringToIndex(column));
                 if (cell != null) {
                     String stringCellValue = cell.getStringCellValue();
                     filenames.get(i).add(stringCellValue);
                 }
-
             }
         }
 

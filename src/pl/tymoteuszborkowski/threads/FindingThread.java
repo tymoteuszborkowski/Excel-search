@@ -28,19 +28,21 @@ public class FindingThread implements Runnable {
 
     private PoiService service = new PoiService();
     private String excelFilePath;
+    private String column;
     private File folderLocalization;
     private String date;
     private ProgressBar progressBar;
     private GridPane layout;
     private Label endWorkLabel;
 
-    public FindingThread(String excelFilePath, File folderLocalization, String date, ProgressBar progressBar, GridPane layout, Label endWorkLabel) throws IOException, InvalidFormatException {
+    public FindingThread(String excelFilePath, String column, File folderLocalization, String date, ProgressBar progressBar, GridPane layout, Label endWorkLabel) throws IOException, InvalidFormatException {
         this.excelFilePath = excelFilePath;
         this.folderLocalization = folderLocalization;
         this.date = date;
         this.progressBar = progressBar;
         this.layout = layout;
         this.endWorkLabel = endWorkLabel;
+        this.column = column;
 
     }
 
@@ -68,7 +70,7 @@ public class FindingThread implements Runnable {
                 progressBar.setProgress(0.2);
                 endWorkLabel.setText(STEP_2);
             });
-            List<List<String>> stringCells = service.getCellsFromColumnB(sheetList);
+            List<List<String>> stringCells = service.getCellsFromColumn(sheetList, column);
 
 
             //deleting duplicated files names from list
