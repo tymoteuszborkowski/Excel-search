@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="Excel_search.jar" size="17175" download="eager" />
+    <jar href="Excel_search.jar" size="32219" download="eager" />
     <jar href="commons-io-2.5.jar" size="208696" download="eager" />
     <jar href="curvesapi-1.03.jar" size="92241" download="eager" />
     <jar href="poi-3.14-20160307.jar" size="2528204" download="eager" />

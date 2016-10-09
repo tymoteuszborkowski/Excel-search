@@ -10,10 +10,7 @@ import pl.tymoteuszborkowski.services.PoiService;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FindingThread implements Runnable {
@@ -44,9 +41,6 @@ public class FindingThread implements Runnable {
         this.layout = layout;
         this.endWorkLabel = endWorkLabel;
         this.column = column;
-
-        System.out.println("CORES:  " + CORES_NUMBERS);
-
     }
 
     @Override
@@ -96,14 +90,34 @@ public class FindingThread implements Runnable {
 
             // if number of sheets is divisible by 2 create '(number of sheet)/2' threads which searching files
 
-            if(((stringFromCellsWithoutDupl.size() % 2) == 0) && (stringFromCellsWithoutDupl.size() <= 8)){
-                for (int i = 0; i < stringFromCellsWithoutDupl.size(); i += 2) {
-                    List<String> cleanerFilenames = stringFromCellsWithoutDupl.get(i);
-                    List<String> cleanerFilenames2 = stringFromCellsWithoutDupl.get(i+1);
-                    List<String> names = new ArrayList<>(cleanerFilenames);
+            Random random = new Random(2);
 
-                    names.addAll(cleanerFilenames2);
-                    threadList.add(new Thread(new SearchingThread(names, folderLocalization, foundedAndNotFounded)));
+            if(CORES_NUMBERS == 3){
+                List<String> oneThreadList = new ArrayList<>();
+                List<String> twoThreadList = new ArrayList<>();
+                List<String> threeThreadList = new ArrayList<>();
+
+                for (int i = 0; i < stringFromCellsWithoutDupl.size(); i++) {
+                    List<String> sheetFilenames = stringFromCellsWithoutDupl.get(i);
+
+                    switch(random.nextInt()){
+                        case 0:
+                            oneThreadList.addAll(sheetFilenames);
+                            break;
+                        case 1:
+                            twoThreadList.addAll(sheetFilenames);
+                            break;
+                        case 2:
+                            threeThreadList.addAll(sheetFilenames);
+                            break;
+                    }
+
+                    System.out.println(oneThreadList.size());
+                    System.out.println(twoThreadList.size());
+                    System.out.println(threeThreadList.size());
+                    threadList.add(new Thread(new SearchingThread(oneThreadList, folderLocalization, foundedAndNotFounded)));
+                    threadList.add(new Thread(new SearchingThread(twoThreadList, folderLocalization, foundedAndNotFounded)));
+                    threadList.add(new Thread(new SearchingThread(threeThreadList, folderLocalization, foundedAndNotFounded)));
                 }
             }else{
                 ArrayList<String> everyFilenames = new ArrayList<>();
@@ -118,7 +132,6 @@ public class FindingThread implements Runnable {
 
             //start every of these threads
             threadList.forEach(Thread::start);
-
 
             // wait for end of every thread
                 for(Thread thread : threadList){

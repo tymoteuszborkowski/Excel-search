@@ -39,6 +39,7 @@ public class PoiService {
     public List<List<String>> getCellsFromColumn(List<Sheet> sheetList, String column) {
 
         List<List<String>> filenames = new ArrayList<>();
+        int columnRef = CellReference.convertColStringToIndex(column);
 
 
         for (int i = 0; i < sheetList.size(); i++) {
@@ -46,12 +47,16 @@ public class PoiService {
             filenames.add(new ArrayList<>());
             for (int j = 0; j < sheet.getLastRowNum(); j++) {
                 Row row = sheet.getRow(j);
-                Cell cell = row.getCell(CellReference.convertColStringToIndex(column));
-                if (cell != null) {
-                    String stringCellValue = cell.getStringCellValue();
-                    filenames.get(i).add(stringCellValue);
+                if(row != null){
+                    Cell cell = row.getCell(columnRef);
+                    if (cell != null) {
+                        String stringCellValue = cell.getStringCellValue();
+                        filenames.get(i).add(stringCellValue);
+                    }
                 }
+
             }
+
         }
 
             return filenames;
